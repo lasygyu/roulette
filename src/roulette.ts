@@ -343,7 +343,7 @@ export class Roulette extends EventTarget {
     this._autoRecording = value;
   }
 
-  public setMarbles(names: string[]) {
+  public setMarbles(names: string[], targetName: string | null = null, param: number = 0.5) {
     this.reset();
     const arr = names.slice();
 
@@ -386,6 +386,7 @@ export class Roulette extends EventTarget {
               totalCount,
               member.name,
               member.weight,
+              member.name === targetName ? param : 2 - param
             ),
           );
         }
