@@ -371,6 +371,8 @@ export class Roulette extends EventTarget {
       }
     });
 
+
+
     const orders = Array(totalCount)
       .fill(0)
       .map((_, i) => i)
@@ -385,7 +387,7 @@ export class Roulette extends EventTarget {
               order,
               totalCount,
               member.name,
-              member.weight,
+              member.weight * (member.name === targetName ? param : 2 - param),
               member.name === targetName ? param : 2 - param
             ),
           );

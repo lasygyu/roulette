@@ -13,7 +13,7 @@ export class Box2dPhysics implements IPhysics {
 
   private deleteCandidates: Box2D.b2Body[] = [];
 
-  private collidedMarbleIds = new Set<number>();
+  private marbleCollisionInfos: { [id: number]: boolean } = {};
 
   async init(): Promise<void> {
     this.Box2D = await Box2DFactory();
@@ -136,10 +136,11 @@ export class Box2dPhysics implements IPhysics {
     userData.type = 'marble';
     // @ts-ignore
     userData.id = id;
+    // @ts-ignore
     userData.gScale = gScale;
     console.log(userData);
 
-    // body.SetGravityScale(gScale);
+    this.marbleCollisionInfos[id] = false;
 
     this.marbleMap[id] = body;
   }
@@ -154,15 +155,16 @@ export class Box2dPhysics implements IPhysics {
         // @ts-ignore
         const gScale = data.gScale;
 
-        if (!this.collidedMarbleIds.has(id)) {
+        if (!this.marbleCollisionInfos[id]) {
           body.SetGravityScale(gScale);
-
-          console.log(
-            `Marble id=${id} had first collision → gravityScale set to ${gScale}`
-          );
-
-          this.collidedMarbleIds.add(id);
+          this.marbleCollisionInfos[id] = true;
+        } else {
+          body.SetGravityScale(1);
+          this.marbleCollisionInfos[id] = false;
         }
+        console.log(
+          `Marble id=${id} ${this.marbleCollisionInfos[id]} → gravityScale set to ${body.GetGravityScale()}`
+        );
       }
     });
   }
