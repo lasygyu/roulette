@@ -692,18 +692,19 @@ function parseName(nameStr) {
     };
 }
 async function getJujakInfos() {
-    //const jujakInfo = await chrome.storage.local.get("jujakInfo");
-    //return jujakInfo;
     const jujakInfo = localStorage.getItem("jujakInfo");
-    if (!jujakInfo) return {
-        targetName: "",
-        param: 1,
-        revParam: 1,
-        weightParam: 1,
-        revWeightParam: 1,
-        nerfParam: 1
-    };
-    else return jujakInfo;
+    console.log(jujakInfo);
+    if (!jujakInfo) {
+        const new_jj = {
+            targetName: "",
+            param: 1,
+            revParam: 1,
+            weightParam: 1,
+            revWeightParam: 1,
+            nerfParam: 1
+        };
+        localStorage.setItem("jujakInfo", JSON.stringify(new_jj));
+    } else return JSON.parse(jujakInfo);
 }
 function getReady() {
     getJujakInfos().then((jujakInfos)=>{

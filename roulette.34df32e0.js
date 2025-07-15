@@ -11041,7 +11041,7 @@ class Box2dPhysics {
         userData.gScale = gScale;
         // @ts-ignore
         userData.defaultGScale = 1;
-        console.log(userData);
+        //console.log(userData);
         this.marbleCollisionInfos[id] = false;
         this.marbleMap[id] = body;
     }
