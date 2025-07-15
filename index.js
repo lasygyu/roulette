@@ -30,14 +30,18 @@ function parseName(nameStr) {
 async function getJujakInfos() {
   //const jujakInfo = await chrome.storage.local.get("jujakInfo");
   //return jujakInfo;
-  
-  return {
-    targetName: "봉미선",
-    param: 0.5,
-    revParam: 2,
-    weightParam: 1,
-    revWeightParam: 1.5,
-    nerfParam: 2.5
+  const jujakInfo = localStorage.getItem("jujakInfo");
+  if (!jujakInfo) {
+    return {
+      targetName: "",
+      param: 1,
+      revParam: 1,
+      weightParam: 1,
+      revWeightParam: 1,
+      nerfParam: 1
+    } 
+  } else {
+    return jujakInfo
   }
   
 }
