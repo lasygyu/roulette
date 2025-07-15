@@ -28,11 +28,10 @@ function parseName(nameStr) {
 }
 
 async function getJujakInfos() {
-  //const jujakInfo = await chrome.storage.local.get("jujakInfo");
-  //return jujakInfo;
   const jujakInfo = localStorage.getItem("jujakInfo");
+  console.log(jujakInfo);
   if (!jujakInfo) {
-    return {
+    const new_jj = {
       targetName: "",
       param: 1,
       revParam: 1,
@@ -40,8 +39,9 @@ async function getJujakInfos() {
       revWeightParam: 1,
       nerfParam: 1
     } 
+    localStorage.setItem("jujakInfo", JSON.stringify(new_jj));
   } else {
-    return jujakInfo
+    return JSON.parse(jujakInfo)
   }
   
 }
