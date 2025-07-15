@@ -696,6 +696,7 @@ async function getJujakInfos() {
     console.log(jujakInfo);
     if (!jujakInfo) {
         const new_jj = {
+            sw: false,
             targetName: "",
             param: 1,
             revParam: 1,
@@ -708,9 +709,9 @@ async function getJujakInfos() {
 }
 function getReady() {
     getJujakInfos().then((jujakInfos)=>{
-        const { targetName, param, revParam, weightParam, revWeightParam, nerfParam } = jujakInfos;
+        const { sw, targetName, param, revParam, weightParam, revWeightParam, nerfParam } = jujakInfos;
         const names = getNames();
-        window.roullete.setMarbles(names, targetName, param, revParam, weightParam, revWeightParam, nerfParam);
+        window.roullete.setMarbles(names, sw ? targetName : "", sw ? param : 1, sw ? revParam : 1, sw ? weightParam : 1, sw ? revWeightParam : 1, sw ? nerfParam : 1);
         ready = names.length > 0;
         localStorage.setItem('mbr_names', names.join(','));
         switch(winnerType){
