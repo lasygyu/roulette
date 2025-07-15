@@ -138,6 +138,8 @@ export class Box2dPhysics implements IPhysics {
     userData.id = id;
     // @ts-ignore
     userData.gScale = gScale;
+    // @ts-ignore
+    userData.defaultGScale = 1;
     console.log(userData);
 
     this.marbleCollisionInfos[id] = false;
@@ -154,17 +156,19 @@ export class Box2dPhysics implements IPhysics {
         const id = data.id;
         // @ts-ignore
         const gScale = data.gScale;
+        // @ts-ignore
+        const defaultGScale = data.defaultGScale;
 
         if (!this.marbleCollisionInfos[id]) {
           body.SetGravityScale(gScale);
           this.marbleCollisionInfos[id] = true;
         } else {
-          body.SetGravityScale(1);
+          body.SetGravityScale(defaultGScale);
           this.marbleCollisionInfos[id] = false;
         }
-        console.log(
+        /*console.log(
           `Marble id=${id} ${this.marbleCollisionInfos[id]} → gravityScale set to ${body.GetGravityScale()}`
-        );
+        );*/
       }
     });
   }
@@ -179,6 +183,23 @@ export class Box2dPhysics implements IPhysics {
 
     this._handleCollision(bodyA, bodyB);
   };
+
+  nerfMarble(id: number, nerfParam: number = 1.2): void {
+    const body = this.marbleMap[id];
+    const data = body.GetUserData();
+    
+    // @ts-ignore
+    if (data.defaultGScale == 1) {
+      // @ts-ignore
+      data.gScale = data.gScale * nerfParam;
+      // @ts-ignore
+      data.defaultGScale = data.defaultGScale * nerfParam;
+      // @ts-ignore
+      console.log(`Nerfed marble id=${id}: gScale ${data.gScale} defaultGScale ${data.defaultGScale}`)
+    } else {
+      console.log(`Did not nerf marble id=${id}: already nerfed`)
+    }
+  }
 
   shakeMarble(id: number): void {
     const body = this.marbleMap[id];

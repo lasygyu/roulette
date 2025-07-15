@@ -56,6 +56,9 @@ export class Roulette extends EventTarget {
     return this._isReady;
   }
 
+  private targetName: string | null = null;
+  private nerfParam: number = 1.2;
+
   constructor() {
     super();
     this._renderer.init().then(() => {
@@ -107,6 +110,18 @@ export class Roulette extends EventTarget {
 
     if (this._marbles.length > 1) {
       this._marbles.sort((a, b) => b.y - a.y);
+    }
+
+    if (this._winners.length > 1) {
+      const l = this._marbles.length;
+      const end = l-5 > 0 ? l-5 : l-1;
+      for (let i = l-1; i > end; i--) {
+        const marble = this._marbles[i];
+        if (marble.name !== this.targetName) {
+          this.physics.nerfMarble(this._marbles[i].id, this.nerfParam);
+        }
+      }
+      console.log(`Nerf applied`);
     }
 
     if (this._stage) {
@@ -343,7 +358,7 @@ export class Roulette extends EventTarget {
     this._autoRecording = value;
   }
 
-  public setMarbles(names: string[], targetName: string | null = null, param: number = 0.5) {
+  public setMarbles(names: string[], targetName: string | null, param: number, revParam: number, weightParam: number, revWeightParam: number, nerfParam: number) {
     this.reset();
     const arr = names.slice();
 
@@ -371,7 +386,8 @@ export class Roulette extends EventTarget {
       }
     });
 
-
+    this.targetName = targetName;
+    this.nerfParam = nerfParam;
 
     const orders = Array(totalCount)
       .fill(0)
@@ -387,8 +403,8 @@ export class Roulette extends EventTarget {
               order,
               totalCount,
               member.name,
-              member.weight * (member.name === targetName ? param : 2 - param),
-              member.name === targetName ? param : 2 - param
+              member.weight * (member.name === this.targetName ? weightParam : revWeightParam),
+              member.name === this.targetName ? param : revParam
             ),
           );
         }

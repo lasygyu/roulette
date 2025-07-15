@@ -25,4 +25,6 @@ export interface IPhysics {
   start(): void;
 
   step(deltaSeconds: number): void;
+
+  nerfMarble(id: number, nerfParam: number): void;
 }
