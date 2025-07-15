@@ -56,6 +56,7 @@ export class Marble {
     max: number,
     name?: string,
     weight: number = 1,
+    gScale: number = 1
   ) {
     this.name = name || `M${order}`;
     this.weight = weight;
@@ -76,6 +77,7 @@ export class Marble {
       order,
       10.25 + (order % 10) * 0.6,
       maxLine - line + lineDelta,
+      gScale
     );
   }
 

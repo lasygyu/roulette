@@ -13,10 +13,20 @@ export class Box2dPhysics implements IPhysics {
 
   private deleteCandidates: Box2D.b2Body[] = [];
 
+  private collidedMarbleIds = new Set<number>();
+
   async init(): Promise<void> {
     this.Box2D = await Box2DFactory();
     this.gravity = new this.Box2D.b2Vec2(0, 10);
     this.world = new this.Box2D.b2World(this.gravity);
+
+    const listener = new this.Box2D.JSContactListener();
+    listener.BeginContact = (contactPtr: number) => this._onBeginContact(contactPtr);
+    listener.EndContact = (_: number) => {};        // no-op
+    listener.PreSolve = (_: number, __: number) => {};  // no-op
+    listener.PostSolve = (_: number, __: number) => {}; // no-op
+    this.world.SetContactListener(listener);
+
     console.log('box2d ready');
   }
 
@@ -108,7 +118,7 @@ export class Box2dPhysics implements IPhysics {
     this.entities = [];
   }
 
-  createMarble(id: number, x: number, y: number): void {
+  createMarble(id: number, x: number, y: number, gScale: number = 1): void {
     const circleShape = new this.Box2D.b2CircleShape();
     circleShape.set_m_radius(0.25);
 
@@ -120,8 +130,53 @@ export class Box2dPhysics implements IPhysics {
     body.CreateFixture(circleShape, 1 + Math.random());
     body.SetAwake(false);
     body.SetEnabled(false);
+
+    const userData = body.GetUserData();
+    // @ts-ignore
+    userData.type = 'marble';
+    // @ts-ignore
+    userData.id = id;
+    userData.gScale = gScale;
+    console.log(userData);
+
+    // body.SetGravityScale(gScale);
+
     this.marbleMap[id] = body;
   }
+
+  private _handleCollision(bodyA: Box2D.b2Body, bodyB: Box2D.b2Body): void {
+    [bodyA, bodyB].forEach((body) => {
+      const data = body.GetUserData();
+      // @ts-ignore
+      if (data?.type === 'marble' && typeof data.id === 'number') {
+        // @ts-ignore
+        const id = data.id;
+        // @ts-ignore
+        const gScale = data.gScale;
+
+        if (!this.collidedMarbleIds.has(id)) {
+          body.SetGravityScale(gScale);
+
+          console.log(
+            `Marble id=${id} had first collision → gravityScale set to ${gScale}`
+          );
+
+          this.collidedMarbleIds.add(id);
+        }
+      }
+    });
+  }
+
+  private _onBeginContact = (contactPtr: number): void => {
+    const contact = this.Box2D.wrapPointer(contactPtr, this.Box2D.b2Contact);
+
+    const fixtureA = contact.GetFixtureA();
+    const fixtureB = contact.GetFixtureB();
+    const bodyA = fixtureA.GetBody();
+    const bodyB = fixtureB.GetBody();
+
+    this._handleCollision(bodyA, bodyB);
+  };
 
   shakeMarble(id: number): void {
     const body = this.marbleMap[id];
